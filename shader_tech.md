@@ -1,6 +1,7 @@
 # Shader Effect Modding Techniques
 
 In this tutorial, we will learn some useful techniques which can be applied for making shader mods.
+
 As a prerequisite, make sure to go over [this tutorial](https://github.com/SilentNightSound/GI-Model-Importer/blob/main/Guides/EffectModdingTutorial.md) made by SilentNightSound. Make sure you understand how to dump shaders, how to edit the text file using a convenient text editor, and how to make INI files to control the shaders.
 
 I will demonstrate using different characters, but these apply to almost all effects.
@@ -8,7 +9,7 @@ I will demonstrate using different characters, but these apply to almost all eff
 ## Before you get started
 The process involves lot of pausing and also repeatedly using the skill/burst in order to identify the shader hashes.
 For spamming skills and burst, cooldowns and energy can be a hindrance. You can use a private server to get around this issue, although its not necessary if you have the patience to do it on official server.
-For pausing, you could use the in-game pause menu, however it is quite scuffed. A better method is to use the Kamera gadget along with the Remove UI mod. Just snap the Kamera at the moment you want to pause and toggle the UI.
+For pausing, you could use the in-game pause menu, however it is quite scuffed. A better method is to use the Kamera gadget along with the [Remove UI](https://gamebanana.com/mods/424034) mod. Just snap the Kamera at the moment you want to pause and toggle the UI.
 For elemental bursts which cannot be paused, you can stand next to a wall/tree etc facing it, that will prevent the burst cam and you will be able to pause.
 Also preferably go to some dark place, it will be easier to see the effects.
 
@@ -21,7 +22,7 @@ This screenshot shows the game paused in middle of Diluc's burst and with a side
 Similarly Kazuha's burst.
 NOTE: In this tutorial I am using game version 3.5. Shader hashes *can* change between different game patches, so do not expect to find the same hashes shown here in your game.
 
-##  Directly setting output channel values
+## Directly setting output channel values
 The most simple method, and it was also explained in Silent's tutorial. You can directly set the values of the different channels to constant values. This will make the whole effect as a uniform color, which means it will lose some finer details.
 I would not recommend using this method unless necessary, because it looks flat and featureless.
 Consider Beidou's skill shown below.
@@ -54,7 +55,7 @@ Here is a bonus image showing what it looks like on perfect counter.
 ![alt text](https://raw.githubusercontent.com/complex31/3DMTutorial/main/shader_tech.md_files/beidouEcounter.png)
 This method is limited in its potential when used alone, but it is very useful when combined with the upcoming methods.
 
-##  Channel Swapping and Assigning
+## Channel Swapping and Assigning
 This is where we start to cook. Colors are made of three components, RGB. At any given point on the effect, these channels can have different values.
 ![alt text](https://raw.githubusercontent.com/complex31/3DMTutorial/main/shader_tech.md_files/dilucE.png)
 In the above screenshot, the part circled in pink would have all channels at high values. While the part circled in green would have mostly red at high values and other channels very low.
@@ -189,9 +190,13 @@ It is worth noting at this point that colors are made of three components. So fa
 Now let us look at a different method of varying colors, but we want to keep them as vibrant as possible, giving us the classic "gamer RGB lights" look.
 This is where the HSV color model comes in. HSV means hue-saturation-value. For our purpose, we want to cycle through all possible hues while maintaining saturation and value(brightness) at maximum. Then we will convert this into RGB so that we can apply it to our effects.
 Below is the formula for conversion of HSV to RGB (from [Wikipedia](https://en.wikipedia.org/wiki/HSL_and_HSV#HSV_to_RGB))
+
 ![alt text](https://raw.githubusercontent.com/complex31/3DMTutorial/main/shader_tech.md_files/hsv2rgb.png)
+
 We derive the H from our time-step variable, by using modulus function. This gives us the remainder when left after dividing by 360, which cycles over all the values from 0 to 360. Basically it gives us all the colors on the boundary of the color wheel as shown below.
+
 ![alt text](https://raw.githubusercontent.com/complex31/3DMTutorial/main/shader_tech.md_files/colorwheel.png)
+
 Now we can implement the formula into code. We will define a function `getColor()` which we can use as needed. You can also implement it directly where the shader output is calculated, but I prefer keeping it separate. We put it just above the line which says `void main`.
 
 ```
@@ -229,7 +234,7 @@ This will give us the gamer RGB lighting.
 
 These are just some of the techniques you can use in your shader mods. The possibilities are endless, so explore and experiment, maybe you discover something that looks cool.
 
-##Shader edits for model textures
+## Shader edits for model textures
 So far we have looked at ways to apply shader edits to visual effects. However, everything that you see on your game is drawn by shaders. And as such they can be edited. These shaders might not be as simple as the ones we have seen so far, and I myself dont fully understand them. Nevertheless, even with this limited knowledge, it is possible to do some cool stuff as we will see now.
 
 First let us learn how to identify the shader for the model parts over which we want to apply the edit. Character models are usually made up of multiple components, and each of these components may have different hashes.
