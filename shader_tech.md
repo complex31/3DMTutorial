@@ -125,7 +125,7 @@ $icon = 1
 [CommandListCharacterControl]
 if $active == 1 || $icon == 1
     x160 = 1
-else if $active == 0 && $effect == 0
+else if $active == 0 && $icon == 0
     x160 = 0
 endif
 ```
